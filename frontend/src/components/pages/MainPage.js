@@ -10,9 +10,25 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './MainPage.css';
 import { FaRocketchat, FaCamera } from 'react-icons/fa'
 import chatImage from './../../chatImage.png'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 function MainPage() {
+  const [inputSelected, setInputSelected] = useState(false)
+  const [meetingCode, setMeetingCode] = useState("")
+  const [expandInput, setExpandInput] = useState(false)
+
+  const inputRef = useRef()
+  const setFocus = () => setInputSelected(true)
+  const setBlur = () => setInputSelected(false)
+  const onChange = () => {
+    setMeetingCode(inputRef.current.value)
+  }
+
+  useEffect(() => {
+    setExpandInput(inputSelected || meetingCode.length > 0)
+    console.log(expandInput)
+  }, [inputSelected, meetingCode])
+
   return (
     <>
       <Navbar bg="dark" variant="dark">
@@ -25,13 +41,8 @@ function MainPage() {
       <Container>
         <Row>
           <Col className="vh-100 d-flex flex-column">
-            <Container style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '100vh'
-            }}>
-              <Card style={{ width: '30em' }}>
+            <Container className="full-vertical-container">
+              <Card id="infoCard">
                 <Card.Body>
                   <Card.Title id="title-text">Realtime Chat</Card.Title>
                   <Card.Text>
@@ -40,20 +51,17 @@ function MainPage() {
                   <div id="buttons-container">
                     <Button variant="info"><FaCamera />{" "} New Meeting</Button> {" "}
                     <Form.Group controlId="formBasicPassword">
-                      <Form.Control type="password" placeholder="Meeting Code" />
+                      <input style={expandInput ? { width: "12em" } : { width: "16em" }} type="text" className="form-control" placeholder="Meeting Code" ref={inputRef} onChange={onChange} onFocus={setFocus} onBlur={setBlur} />
                     </Form.Group>
+                    {" "}
+                    {meetingCode.length > 0 ? <Button variant="info">Join</Button> : <></>}
                   </div>
                 </Card.Body>
               </Card>
             </Container>
           </Col>
           <Col className="vh-100 d-flex flex-column">
-            <Container style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '100vh'
-            }}>
+            <Container className="full-vertical-container">
               <Image src={chatImage} rounded />
             </Container>
           </Col>
