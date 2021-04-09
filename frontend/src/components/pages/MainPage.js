@@ -1,4 +1,3 @@
-import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
@@ -6,68 +5,80 @@ import Card from 'react-bootstrap/Card'
 import Image from 'react-bootstrap/Image'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
-import { FaRocketchat, FaCamera } from 'react-icons/fa'
-import chatImage from './../../chatImage.png'
+import Alert from 'react-bootstrap/Alert';
+import { FaCamera } from 'react-icons/fa'
 
-import { serverRoute } from '../../utility/constants'
+import chatImage from './../../chatImage.png'
+import { SERVER_ROUTE } from '../../utility/constants'
+import NavigationBar from '../NavigationBar'
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './MainPage.css';
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { useHistory } from 'react-router-dom'
 import axios from 'axios'
 
 function MainPage(props) {
-  const [inputSelected, setInputSelected] = useState(false)
   const [meetingCode, setMeetingCode] = useState("")
-  const [expandInput, setExpandInput] = useState(false)
+  const [alertMessage, setAlertMessage] = useState("")
 
-  const inputRef = useRef()
-  const setFocus = () => setInputSelected(true)
-  const setBlur = () => setInputSelected(false)
+  const usernameRef = useRef()
+  const meetingCodeRef = useRef()
+
+  const VANISH_TIME = 5000
+
   const onChange = () => {
-    setMeetingCode(inputRef.current.value)
+    setMeetingCode(meetingCodeRef.current.value)
   }
-
-  useEffect(() => {
-    setExpandInput(inputSelected || meetingCode.length > 0)
-    console.log(expandInput)
-  }, [inputSelected, meetingCode])
 
   const history = useHistory()
   const createRoomButton = () => {
-    axios.get(`${serverRoute}/create_room`)
+    const username = usernameRef.current.value
+    if (!username) {
+      setAlertMessage('Please enter a username.')
+
+      setTimeout(() => {
+        setAlertMessage('')
+      }, VANISH_TIME)
+
+      return
+    }
+
+    axios.get(`${SERVER_ROUTE}/create_room`)
       .then((res) => {
         const ID = res.data.ID
-        history.push(`/room_host?id=${ID}`)
+        history.push(`/room_host?id=${ID}&username=${username}`)
       })
   }
 
   const joinRoomButton = () => {
-    axios.get(`${serverRoute}/validate_room?ID=${meetingCode}`)
+    const username = usernameRef.current.value
+    if (!username) {
+      setAlertMessage('Please enter a username.')
+      setTimeout(() => {
+        setAlertMessage('')
+      }, VANISH_TIME)
+    }
+
+    axios.get(`${SERVER_ROUTE}/validate_room?ID=${meetingCode}`)
       .then(res => {
         const valid = res.data.exists
 
         if (valid) {
-          history.push(`/room_guest?id=${meetingCode}`)
+          history.push(`/room_guest?id=${meetingCode}&username=${username}`)
         }
         else {
-          inputRef.current.value = ''
+          meetingCodeRef.current.value = ''
+          setAlertMessage('Invalid meeting code.')
         }
       })
   }
 
   return (
-    <>
-      <Navbar bg="dark" variant="dark">
-        <Navbar.Brand href="#home">
-          <FaRocketchat />
-          {" "}
-        Realtime Chat Application
-        </Navbar.Brand>
-      </Navbar>
-      <Container>
+    <div className="all-container">
+      <NavigationBar />
+      <Container className="main-container">
         <Row>
           <Col className="vh-100 d-flex flex-column">
             <Container className="full-vertical-container">
@@ -78,12 +89,20 @@ function MainPage(props) {
                     Premium video chat meetings. Free and secure.
                   </Card.Text>
                   <div id="buttons-container">
+                    <div>
+                      <Form.Group>
+                        <input id="usernameInput" type="text" className="form-control" placeholder="Username" ref={usernameRef} />
+                      </Form.Group>
+                    </div>
+
+                    {" "}
                     <Button variant="info" onClick={createRoomButton}><FaCamera />{" "} New Meeting</Button> {" "}
-                    <Form.Group controlId="formBasicPassword">
-                      <input style={expandInput ? { width: "12em" } : { width: "16em" }} type="text" className="form-control" placeholder="Meeting Code" ref={inputRef} onChange={onChange} onFocus={setFocus} onBlur={setBlur} />
+                    <Form.Group>
+                      <input style={meetingCode.length ? { width: "10em" } : { width: "14em" }} type="text" className="form-control" placeholder="Meeting Code" ref={meetingCodeRef} onChange={onChange} />
                     </Form.Group>
                     {" "}
-                    {meetingCode.length > 0 ? <Button onClick={joinRoomButton} variant="info">Join</Button> : <></>}
+                    {meetingCode.length ? <Button onClick={joinRoomButton} variant="info">Join</Button> : <></>}
+                    {alertMessage ? <Alert variant="danger">{alertMessage}</Alert> : <></>}
                   </div>
                 </Card.Body>
               </Card>
@@ -96,7 +115,7 @@ function MainPage(props) {
           </Col>
         </Row>
       </Container>
-    </>
+    </div>
   );
 }
 

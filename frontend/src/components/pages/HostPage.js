@@ -1,20 +1,27 @@
+import NavigationBar from '../NavigationBar'
+import Room from '../Room'
+
 import { useState, useEffect, useRef } from 'react'
 import Peer from 'simple-peer'
+import './HostPage.css'
 const qs = require('qs')
 
 function HostPage(props) {
   const socket = props.socket
 
   const [stream, setStream] = useState()
+  const [username, setUsername] = useState()
   const myVideoRef = useRef()
   const otherVideoRef = useRef()
-  let roomID = ''
+  let room = ''
 
   let peer
   useEffect(() => {
     // Initializing room
-    roomID = qs.parse(window.location.href.split('?')[1], { ignoreQueryPrefix: true }).id
-    socket.emit('join_room', roomID)
+    const queryStrings = qs.parse(window.location.href.split('?')[1], { ignoreQueryPrefix: true })
+    room = queryStrings.id
+    setUsername(queryStrings.username)
+    socket.emit('join_room', { room, user: queryStrings.username })
 
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
       .then(stream => {
@@ -32,7 +39,7 @@ function HostPage(props) {
           peer.signal(signal)
 
           peer.on('signal', signal => {
-            socket.emit('connect_host', { roomID, signal })
+            socket.emit('connect_host', { room, signal })
           })
         })
 
@@ -43,18 +50,10 @@ function HostPage(props) {
       })
   }, [])
 
-  useEffect(() => {
-
-
-    //peer.on('stream', stream => {
-    //  console.log('Host Stream')
-    //})
-  }, [stream])
-
   return (
     <>
-      <video playsInline muted ref={myVideoRef} autoPlay style={{ width: "300px" }} />
-      <video playsInline muted ref={otherVideoRef} autoPlay style={{ width: "300px" }} />
+      <NavigationBar />
+      <Room myVideoRef={myVideoRef} otherVideoRef={otherVideoRef} socket={socket} />
     </>
   );
 }

@@ -1,20 +1,25 @@
+import NavigationBar from '../NavigationBar'
+import Room from '../Room'
+
 import { useState, useEffect, useRef } from 'react'
+import { SERVER_ROUTE } from '../../utility/constants'
+import io from 'socket.io-client'
 import Peer from 'simple-peer'
 const qs = require('qs')
 
 function GuestPage(props) {
   const socket = props.socket
-
   const [stream, setStream] = useState()
   const myVideoRef = useRef()
   const otherVideoRef = useRef()
-  let roomID = ''
+  let room = ''
 
   let peer
   useEffect(() => {
     // Initializing room
-    roomID = qs.parse(window.location.href.split('?')[1], { ignoreQueryPrefix: true }).id
-    socket.emit('join_room', roomID)
+    const queryStrings = qs.parse(window.location.href.split('?')[1], { ignoreQueryPrefix: true })
+    room = queryStrings.id
+    socket.emit('join_room', { room, user: queryStrings.username })
 
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
       .then(stream => {
@@ -29,7 +34,7 @@ function GuestPage(props) {
 
         // Emitting signal to host
         peer.on('signal', signal => {
-          socket.emit('connect_guest', { roomID, signal })
+          socket.emit('connect_guest', { room, signal })
         })
 
         // Connecting to host signal
@@ -44,42 +49,10 @@ function GuestPage(props) {
       })
   }, [])
 
-  /*
-  let called = false
-  useEffect(() => {
-    if (called) return
-    called = true
-    peer = new Peer({
-      initiator: true,
-      trickle: false,
-      stream: stream
-    })
-
-    console.log('In Effect')
-
-    peer.on('signal', signal => {
-      console.log('fuck')
-      socket.emit('connect_guest', { roomID, signal })
-    })
-
-
-    socket.on('connect_signal', signal => {
-      console.log(signal)
-      console.log('back')
-      peer.signal(signal)
-      console.log('sonncted')
-    })
-
-    //peer.on('stream', stream => {
-    //  console.log('Guest Stream')
-    //})
-  }, [stream])
-  */
-
   return (
     <>
-      <video playsInline muted ref={myVideoRef} autoPlay style={{ width: "300px" }} />
-      <video playsInline muted ref={otherVideoRef} autoPlay style={{ width: "300px" }} />
+      <NavigationBar />
+      <Room myVideoRef={myVideoRef} otherVideoRef={otherVideoRef} socket={socket} />
     </>
   );
 }

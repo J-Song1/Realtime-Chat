@@ -4,7 +4,8 @@ import './App.css';
 import MainPage from './components/pages/MainPage'
 import HostPage from './components/pages/HostPage'
 import GuestPage from './components/pages/GuestPage'
-import { serverRoute } from './utility/constants'
+import { SERVER_ROUTE } from './utility/constants'
+import { useEffect } from 'react'
 import io from 'socket.io-client'
 import {
   BrowserRouter as Router,
@@ -12,8 +13,12 @@ import {
   Route
 } from "react-router-dom";
 
-const socket = io.connect(serverRoute)
+const socket = io.connect(SERVER_ROUTE)
 function App() {
+  useEffect(() => {
+    console.log(socket)
+  }, [])
+
   return (
     <Router>
       <Switch>

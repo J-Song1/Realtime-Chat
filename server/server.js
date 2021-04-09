@@ -18,26 +18,48 @@ app.use(cors({
 }));
 
 let rooms = []
+let roomMapping = new Map()
 io.on('connection', socket => {
-  socket.on('join_room', room => {
+  console.log(`New Connection. Socket ID: ${socket.id}`)
+
+  socket.on('join_room', ({ room, user }) => {
     socket.join(room)
-    console.log(`${socket.id} joined room ${room}.`)
+    roomMapping.set(socket.id, room)
+
+    console.log(`${user} (${socket.id}) joined room ${room}.`)
+
+    socket.emit('chat_message', {
+      user: 'Admin',
+      time: '7:03pm',
+      message: `Welcome to Realtime Chat ${user}. Your meeting code is '${room}'. Share it with others you want in the meeting.`
+    });
   })
 
-  socket.on('connect_guest', ({ signal, roomID }) => {
-    socket.to(roomID).emit('connect_signal', signal)
+  socket.on('connect_guest', ({ signal, room }) => {
+    socket.to(room).emit('connect_signal', signal)
   })
 
-  socket.on('connect_host', ({ signal, roomID }) => {
-    socket.to(roomID).emit('connect_signal', signal)
+  socket.on('connect_host', ({ signal, room }) => {
+    socket.to(room).emit('connect_signal', signal)
+  })
+
+  socket.on('message', ({ user, message }) => {
+    console.log(`${user} send a message.`)
+
+    const room = roomMapping.get(socket.id)
+    io.in(room).emit('chat_message', {
+      user,
+      message,
+      time: 'a'
+    })
   })
 })
 
 // Basic create and validate room endpoints
 app.get('/create_room', (req, res) => {
+  // User unique id library for cleaner code
   const ID = createRoomID()
   rooms.push(ID)
-  console.log(rooms)
   res.status(200).json({ ID })
 })
 

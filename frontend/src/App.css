@@ -12,7 +12,6 @@ html, body, #root, .App {
 .col {
   padding-left: 0;
   padding-right: 0;
-  background-color:cadetblue;
 }
 
 #title-text {
@@ -20,7 +19,6 @@ html, body, #root, .App {
 }
 
 #buttons-container {
-  float: left;
   display: inline-block;
 }
 

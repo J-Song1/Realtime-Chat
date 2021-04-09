@@ -1,0 +1,92 @@
+.outsideRow {
+  position: relative;
+}
+
+#my-video-container {
+  top: 5px;
+  right: 5px;
+  position: absolute;
+  width: 200px;
+  height: 150px;
+  background-color: white;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+#my-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 5px;
+}
+
+#other-video-container {
+  background-color: black;
+  width: 100%;
+  height: 80%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+#other-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+#left-column {
+  width: 75%;
+  position: absolute;
+}
+
+#right-column {
+  width: 25%;
+  left: 75%;
+  position: absolute;
+}
+
+.chat-messages-header {
+  height: 5%;
+  background: white;
+  text-align: center;
+  padding: 10px;
+  border-bottom: 1px solid black;
+}
+
+.chat-messages-header div {
+  display: inline;
+}
+
+.chat-messages-header p {
+  font-family: Futura, "Trebuchet MS", Arial, sans-serif;
+  display: inline;
+  font-size: 24px;
+  margin-right: 5px;
+  margin-left: 5px;
+}
+
+.chat-messages {
+  height: 80%;
+  padding: 10px;
+  background-color: white;
+  overflow-y: scroll;
+}
+
+.chat-form-container {
+  height: 5%;
+  background: #ffefc1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.chat-form-container #msg {
+  width: 70%;
+  height: 80%;
+}
+
+.chat-form-container .button {
+  width: 30%;
+  height: 80%;
+}

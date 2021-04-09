@@ -1,5 +1,5 @@
-const serverRoute = 'http://localhost:5000'
+const SERVER_ROUTE = 'http://localhost:5000'
 
 module.exports = {
-  serverRoute
+  SERVER_ROUTE
 }

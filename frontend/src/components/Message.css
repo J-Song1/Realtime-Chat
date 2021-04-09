@@ -1,0 +1,11 @@
+.message {
+  padding: 10px;
+  margin-bottom: 15px;
+  background-color: #ffefc1;
+  border-radius: 10px;
+  font-family: Futura, "Trebuchet MS", Arial, sans-serif;
+}
+
+.message .meta {
+  color: #808080;
+}
