@@ -16,7 +16,7 @@ import {
 const socket = io.connect(SERVER_ROUTE)
 function App() {
   useEffect(() => {
-    console.log(socket)
+    // console.log(socket)
   }, [])
 
   return (

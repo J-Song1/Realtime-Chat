@@ -1,0 +1,19 @@
+:root {
+  margin: 0;
+}
+
+/*
+Main Colors
+- Teal Blue
+- Moonstone Blue
+- Power Blue
+- Magic Mint
+- White Smoke
+*/
+:root {
+  --main-color-1: #388087;
+  --main-color-2: #6fb3b8;
+  --main-color-3: #badfe7;
+  --main-color-4: #2cedce;
+  --main-color-5: #f6f6f2;
+}
